@@ -1,6 +1,5 @@
 #Questionable Snowman
-#Or:
-#Attack Of The Maybe Killer (But More Like Motivationally-Ambiguous) Snowpeople ☃
+##Or: Attack Of The Maybe Killer (But More Like Motivationally-Ambiguous) Snowpeople ☃
 
 >*A simple ludum dare game about knocking hats of snowmen.*
 
