@@ -905,7 +905,7 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
         }
 
         // start with 1 above 
-        AddActiveSnowManAtDir(enemies, Buffer, -50, 0); // first is always above
+        AddActiveSnowManAtDir(enemies, Buffer, -50, 3); // first is always to right
         SnowmanSpawnIn = SnowmanSpawnTimerBase + SnowmanSpawnTimerExtra; // slower first spawn
         // for (int i = 0; i < 3; i++) 
         // {
@@ -1283,11 +1283,14 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
                 {
                     int k = hit-1; // actual index of hit piece
 
+					float thisNudge = nudgeAmount * 8.0f;
+                    if (k == 3) thisNudge *= 2; // hat is one-hit kill
+
                     rect OffsetRect = {};
-                    if (snowballs[i].dir == 1) OffsetRect = { 0, -nudgeAmount*dt, 0, 0 };
-                    if (snowballs[i].dir == 2) OffsetRect = { -nudgeAmount*dt, 0, 0, 0 };
-                    if (snowballs[i].dir == 3) OffsetRect = { 0,  nudgeAmount*dt, 0, 0 };
-                    if (snowballs[i].dir == 4) OffsetRect = {  nudgeAmount*dt, 0, 0, 0 };
+                    if (snowballs[i].dir == 1) OffsetRect = { 0, -thisNudge, 0, 0 };
+                    if (snowballs[i].dir == 2) OffsetRect = { -thisNudge, 0, 0, 0 };
+                    if (snowballs[i].dir == 3) OffsetRect = { 0,  thisNudge, 0, 0 };
+                    if (snowballs[i].dir == 4) OffsetRect = {  thisNudge, 0, 0, 0 };
 
                     enemies[j].pieces[k].pos = AddRects(
                                                       enemies[j].pieces[k].pos,

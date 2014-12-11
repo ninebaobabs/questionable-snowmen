@@ -181,7 +181,7 @@ global_variable float launchDelay = 510;
 global_variable float maxDistFactor = 550.0f;
 global_variable float ballSpeed = 0.4f;
 global_variable float snowballAffectedByPlayerSpeedFactor = 2.0f;
-global_variable float nudgeAmount = 0.6f;
+global_variable float nudgeAmount = 1.0f; //0.6f;
 global_variable float PlayerTouchRadius = 18;
 
 
