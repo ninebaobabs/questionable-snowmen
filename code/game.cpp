@@ -679,8 +679,8 @@ AddActiveSnowManAtDir(snow_person *enemies, game_buffer *Screen, float distInFro
     if (!foundOne)
     {
         // added all we have,
-        // increase snowman speed and reset timer, should feel like waves?
-        SnowmanSpeed += 0.004f; 
+        // if we get here the player is probably overwhelmed, reset timer
+        // SnowmanSpeed += 0.004f; 
         SnowmanSpawnTimerExtra = SnowmanSpawnTimerExtraDefault;
     }
 
@@ -741,7 +741,7 @@ SnowmanTouchesPlayer(snow_person man, rect player)
 
 // }
 
-const global_variable int maxDeadPieces = 200;
+const global_variable int maxDeadPieces = 30;
 global_variable int deadPieceNextIndex;
 global_variable int freedPieceIndex = 0; // should be <= nextIndex
 global_variable dead_piece deadPieces[maxDeadPieces];
@@ -778,6 +778,11 @@ UpdateDeadPiece(dead_piece *piece, float dt)
     }
 }
 
+// internal void
+// KillDeadPiece(dead_piece *piece)
+// {
+
+// }
 
 
 global_variable float secondSinceGameOver;
@@ -836,7 +841,10 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
     local_persist bool atLeastOneWASDKey;
     local_persist float tutTimeReq;
 
-// dt/=2;
+    local_persist int lastScore;
+
+    // dt*=2;
+    // dt/=2;
      // dt = 6.0f;
 
     if (GameOver)
@@ -893,6 +901,10 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
         SnowmanSpawnTimerExtra = SnowmanSpawnTimerExtraDefault;
         SnowmanSpeed = SnowmanSpeedDefault;
 
+        nudgeAmount = nudgeAmountDefault;
+        lastScore = 0;
+
+
         // *Message = "wasd";
 
         playerRect = {Buffer->Width/2, Buffer->Height/2, 32, 24};
@@ -929,7 +941,6 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
         atLeastOneArrowKey = false;
         atLeastOneWASDKey = false;
 
-
         GameInitialized = true;
     }
 
@@ -937,7 +948,12 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
 
     if (!GameOver) 
     {
-
+        // try y = 1-((x/800)^.3)
+        if (lastScore != *Score) {
+            if (*Score < 800) SnowmanSpeed += (1.0f-((*Score)/100.0f))/1000.0f;
+            if (*Score>0 && *Score%100 == 0) nudgeAmount -= .2f;
+        }
+        lastScore = *Score;
 
         // instructions...
         if (Input.up || Input.left || Input.down || Input.right) atLeastOneArrowKey = true;
@@ -1157,14 +1173,16 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
 
                 float tx = px;
                 float ty = py;
-                float speed = SnowmanSpeed;
+                float speed = SnowmanSpeed * enemies[i].randomSpeedFactor;
                 if (dist2p > (SnowmanStrikeRadius+5))
                 {
                     tx = px + enemies[i].targetOffsetX;
                     ty = py + enemies[i].targetOffsetY;
-                    speed = SnowmanStrikeSpeed;
                 }
-                speed *= enemies[i].randomSpeedFactor;
+                else
+                {
+                    speed *= SnowmanStrikeSpeed;
+                }
 
                 float dist = sqrt(((tx-ax)*(tx-ax) + (ty-ay)*(ty-ay)));
 
@@ -1219,14 +1237,14 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
 
     for (int i = 0; i < maxDeadPieces; i++)
     {
-        if (deadPieces[i].height > 0)
-        {
-            UpdateDeadPiece(&deadPieces[i], dt);
-        }
-        else
-        {
+        // if (deadPieces[i].height > 0)
+        // {
+        //     UpdateDeadPiece(&deadPieces[i], dt);
+        // }
+        // else
+        // {
             BakeIntoBG(deadPieces[i].pos, bgBuffer);
-        };
+        // };
     }
 
 
@@ -1383,6 +1401,7 @@ MainGameLoop(game_buffer *Buffer, game_buffer *bgBuffer, game_input Input,
     {
         if (snowballs[i].life >= 0)
         {
+            FillRectInBuffer(AddRects(snowballs[i].colPos,{2,2,0,0}), Buffer, SnowballShadow);
             FillRectInBuffer(snowballs[i].colPos, Buffer, SnowballColor);
         }
     }

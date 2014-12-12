@@ -153,7 +153,7 @@ global_variable COLOR PlayerMittsDead = ~ReallyRed;
 
 
 
-global_variable COLOR DeadPieceColor = MakeColor(240-8, 250-7, 240-8);
+global_variable COLOR DeadPieceColor = MakeColor(240-14, 250-8, 240-9);
 global_variable COLOR DeadHatColor = MakeColor(45+20, 45+20, 45+20);
 
 
@@ -163,7 +163,7 @@ global_variable COLOR SnowmanHead = MakeColor(240, 250, 240);
 global_variable COLOR SnowmanShadow = MakeColor(205, 205, 180);
 
 global_variable COLOR SnowballColor  = MakeColor(250, 255, 249);
-global_variable COLOR SnowballShadow = MakeColor(201, 210, 186);  // going more blue
+global_variable COLOR SnowballShadow = MakeColor(213, 222, 198);  // less contrast with ground
 
 
 
@@ -181,23 +181,24 @@ global_variable float launchDelay = 510;
 global_variable float maxDistFactor = 550.0f;
 global_variable float ballSpeed = 0.4f;
 global_variable float snowballAffectedByPlayerSpeedFactor = 2.0f;
-global_variable float nudgeAmount = 1.0f; //0.6f;
+global_variable float nudgeAmount;
+global_variable float nudgeAmountDefault = 1.0f; //0.6f;
 global_variable float PlayerTouchRadius = 18;
 
 
 // SNOWMEN SETTINGS
 const global_variable int MaxSnowmen = 16;
-global_variable float SnowmanSpeed = 0.04f;
-global_variable float SnowmanSpeedDefault = 0.04f;
+global_variable float SnowmanSpeed; //0.14f for crazy mode
+global_variable float SnowmanSpeedDefault = 0.05f;
 global_variable float SnowmanSpeedPercentRange = 40; // 2 sided, ±half this
-global_variable float SnowmanStrikeSpeed = SnowmanSpeed*1.2f;
+global_variable float SnowmanStrikeSpeed = 1.2f;
 // global_variable float SnowmanSpawnTimer = 5000.0f; //ms?
 // global_variable float SnowmanSpawnTimerDefault = 5000.0f; //ms?
 global_variable float SnowmanSpawnIn = 0;
 global_variable float SnowmanStrikeRadius = 128.0f;
 
-global_variable float SnowmanSpawnTimerBase = 2000.0f; //ms?
-global_variable float SnowmanSpawnTimerExtra = 2000.0f; //ms?
+global_variable float SnowmanSpawnTimerBase = 1700.0f; //ms?
+global_variable float SnowmanSpawnTimerExtra; //ms?
 global_variable float SnowmanSpawnTimerExtraDefault = 2000.0f; //ms?
 
 // global_variable float SnowmanJumpUpSpeed = 5.3f; //gotta overcome gravitry

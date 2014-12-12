@@ -7,6 +7,7 @@
 
 
 global_variable bool GlobalRunning;
+global_variable bool GlobalPause;
 global_variable win32_buffer Win32Buffer;
 global_variable HDC CompatableDC;
 
@@ -213,6 +214,27 @@ Win32WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GlobalRunning = false;
 		} break;
 
+
+		case WM_ACTIVATE:
+		{
+			GlobalPause = false;
+		} break;
+
+		case WM_KILLFOCUS:
+		// case WM_SIZE:
+		case WM_MOVE:
+		{
+			if (GlobalRunning) GlobalPause = true;
+		} break;
+
+
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		{
+			GlobalPause = false;
+		} break;
 
 		// this helps the flicker, i think
 		// case WM_ERASEBKGND:
@@ -458,37 +480,40 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 					DispatchMessage(&Message);
 				}
 
-				game_input InputThisFrame = Win32ReadKeyboardState();
-
-				game_buffer RefToBufferForGameToFill = {};
-				RefToBufferForGameToFill.Memory = Win32Buffer.Memory; // pointer will point to the same memory
-				RefToBufferForGameToFill.Width = Win32Buffer.Width;
-				RefToBufferForGameToFill.Height = Win32Buffer.Height;
-
-				game_buffer BGBuffer = {};
-				BGBuffer.Memory = Win32BGBuffer.Memory; // pointer will point to the same memory
-				BGBuffer.Width = Win32BGBuffer.Width;
-				BGBuffer.Height = Win32BGBuffer.Height;
-
-
+				// not sure best way to handle this with pausing
 				QueryPerformanceCounter(&ThisCounter);
 				TicksElapsed.QuadPart = ThisCounter.QuadPart - LastCounter.QuadPart;
 				float dt = (float)(TicksElapsed.QuadPart * 1000) / CounterFrequency.QuadPart;
 				LastCounter = ThisCounter;
 
-				// char* BigMessage;
 				char GlobalMessage[256] = {};
 				char GlobalMessage2[256] = {};
 
-				MainGameLoop(&RefToBufferForGameToFill, &BGBuffer, InputThisFrame, 
-				             &GlobalScore, GlobalMessage, GlobalMessage2, dt);
+				if (!GlobalPause)
+				{
+					game_input InputThisFrame = Win32ReadKeyboardState();
 
+					game_buffer RefToBufferForGameToFill = {};
+					RefToBufferForGameToFill.Memory = Win32Buffer.Memory; // pointer will point to the same memory
+					RefToBufferForGameToFill.Width = Win32Buffer.Width;
+					RefToBufferForGameToFill.Height = Win32Buffer.Height;
+
+					game_buffer BGBuffer = {};
+					BGBuffer.Memory = Win32BGBuffer.Memory; // pointer will point to the same memory
+					BGBuffer.Width = Win32BGBuffer.Width;
+					BGBuffer.Height = Win32BGBuffer.Height;
+
+					MainGameLoop(&RefToBufferForGameToFill, &BGBuffer, InputThisFrame, 
+					             &GlobalScore, GlobalMessage, GlobalMessage2, dt);
+				}
+				else
+				{
+					//char PausedMsg[256] = "PAUSED";
+					sprintf(GlobalMessage, "PAUSED");//PausedMsg;
+				}
 
 				Win32DisplayBufferOnScreenDouble(&Win32Buffer, GlobalScore, GlobalMessage, GlobalMessage2, 
 				                                 Window, DeviceContext, OffsDC);
-				// Win32DisplayBufferOnScreenSingle(&Win32Buffer, GlobalScore, GlobalMessage, 
-				//                                  Window, DeviceContext);
-
 
 
 				LARGE_INTEGER LastCounter;
